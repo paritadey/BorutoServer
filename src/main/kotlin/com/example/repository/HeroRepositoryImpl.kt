@@ -406,19 +406,39 @@ class HeroRepositoryImpl : HeroRepository {
         if (page in 1..4) {
             nextPage = nextPage?.plus(1)
         }
-        if(page in 2..5){
+        if (page in 2..5) {
             prevPage = prevPage?.minus(1)
         }
-        if(page==1){
+        if (page == 1) {
             prevPage = null
         }
-        if(nextPage==5){
+        if (nextPage == 5) {
             nextPage = null
         }
         return mapOf(PREVIOUS_PAGE_KEY to prevPage, NEXT_PAGE_KEY to nextPage)
     }
 
-    override suspend fun searchHeroes(name: String): ApiResponse {
-        TODO("Not yet implemented")
+    override suspend fun searchHeroes(name: String?): ApiResponse {
+        return ApiResponse(
+            success = true,
+            message = "Ok",
+            heroes = findHeroes(query=name)
+        )
+    }
+
+    private fun findHeroes(query: String?): List<Hero> {
+        val founded = mutableListOf<Hero>()
+        return if (!query.isNullOrEmpty()) {
+            heroes.forEach { (_, heroes) ->
+                heroes.forEach { hero ->
+                    if (hero.name.lowercase().contains(query.lowercase())) {
+                        founded.add(hero)
+                    }
+                }
+            }
+            founded
+        } else {
+            emptyList()
+        }
     }
 }
